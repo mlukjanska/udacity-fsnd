@@ -15,6 +15,7 @@ from logging import Formatter, FileHandler
 from flask_wtf import Form
 from sqlalchemy import JSON
 from forms import *
+from sqlalchemy.dialects.postgresql import JSON
 import collections
 import collections.abc
 collections.Callable = collections.abc.Callable
@@ -34,6 +35,8 @@ migrate = Migrate(app, db) # bootstrap migrations
 
 class Venue(db.Model):
   __tablename__ = 'Venue'
+
+  serialize_only = ('name', 'city', 'state', 'address', 'phone', 'genres', 'facebook_link', 'image_link', 'website_link', 'looking_for_talent', 'seeking_description')
 
   id = db.Column(db.Integer, primary_key=True)
   name = db.Column(db.String, nullable=False)
@@ -154,15 +157,14 @@ def show_venue(venue_id):
   # TODO: replace with real venue data from the venues table, using venue_id
   error = False
   try:
-    data = Venue.query.get(venue_id) 
-    data.genres = json.loads(data.genres)
+    data = Venue.query.get(venue_id)
   except:
     error = True
     print(sys.exc_info())
   finally:
     db.session.close()
     if  error == True:
-        flash('An error occurred. Could not get venue with id: ' + venue_id)
+        flash('An error occurred getting venue with id: ' + str(venue_id))
         return render_template('errors/500.html')
     else:    
       return render_template('pages/show_venue.html', venue=data)
@@ -181,6 +183,8 @@ def create_venue_submission():
   # TODO: modify data to be the data object returned from db insertion
   form = VenueForm()
   error = False
+  venue = {}
+  venue_id = ''
   app.logger.debug("DEBUG: Venue form submission " + form.name.data)
   try:
       name = form.name.data
@@ -207,8 +211,11 @@ def create_venue_submission():
         website_link=website_link,
         looking_for_talent=looking_for_talent,
         seeking_description=seeking_description)
+
       db.session.add(venue)
       db.session.commit()
+      app.logger.debug("DEBUG: venue_id " + str(venue.id))
+      venue_id = venue.id
   except:
       error = True
       db.session.rollback()
@@ -216,11 +223,13 @@ def create_venue_submission():
   finally:
       db.session.close()
       if  error == True:
-          flash('An error occurred. Venue ' + request.form['name'] + ' could not be listed.')
+          flash("An error occurred. Venue '" + form.name.data + "' could not be listed.")
           return render_template('errors/500.html')
       else:    
-          flash('Venue ' + request.form['name'] + ' was successfully listed!')
-          return render_template('pages/home.html')
+          flash("Venue '" + form.name.data + "' was successfully listed!")
+          # return render_template('pages/home.html')
+          # return render_template('pages/show_venue.html', venue=venue_data)
+          return show_venue(venue_id)
 
 @app.route('/venues/<venue_id>', methods=['DELETE'])
 def delete_venue(venue_id):
