@@ -13,6 +13,7 @@ from flask_sqlalchemy import SQLAlchemy
 import logging
 from logging import Formatter, FileHandler
 from flask_wtf import Form
+from sqlalchemy import JSON
 from forms import *
 import collections
 import collections.abc
@@ -32,34 +33,52 @@ migrate = Migrate(app, db) # bootstrap migrations
 #----------------------------------------------------------------------------#
 
 class Venue(db.Model):
-    __tablename__ = 'Venue'
+  __tablename__ = 'Venue'
 
-    id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String)
-    city = db.Column(db.String(120))
-    state = db.Column(db.String(120))
-    address = db.Column(db.String(120))
-    phone = db.Column(db.String(120))
-    image_link = db.Column(db.String(500))
-    facebook_link = db.Column(db.String(120))
+  id = db.Column(db.Integer, primary_key=True)
+  name = db.Column(db.String, nullable=False)
+  city = db.Column(db.String(120), nullable=False)
+  state = db.Column(db.String(120), nullable=False)
+  address = db.Column(db.String(120), nullable=False)
+  phone = db.Column(db.String(120), nullable=True)
+  genres = db.Column(JSON, nullable=False)
+  facebook_link = db.Column(db.String(120), nullable=True)
+  image_link = db.Column(db.String(500), nullable=True)
+  website_link = db.Column(db.String(500), nullable=True)
+  looking_for_talent = db.Column(db.Boolean, default=False, nullable=True)
+  seeking_description = db.Column(db.String(500), nullable=True)
 
-    # TODO: implement any missing fields, as a database migration using Flask-Migrate
+  def __repr__(self):
+      return f'<Venue {self.id} {self.name}>'
 
 class Artist(db.Model):
-    __tablename__ = 'Artist'
+  __tablename__ = 'Artist'
 
-    id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String)
-    city = db.Column(db.String(120))
-    state = db.Column(db.String(120))
-    phone = db.Column(db.String(120))
-    genres = db.Column(db.String(120))
-    image_link = db.Column(db.String(500))
-    facebook_link = db.Column(db.String(120))
+  id = db.Column(db.Integer, primary_key=True)
+  name = db.Column(db.String, nullable=False)
+  city = db.Column(db.String(120), nullable=False)
+  state = db.Column(db.String(120), nullable=False)
+  phone = db.Column(db.String(120), nullable=True)
+  genres = db.Column(JSON, nullable=False)
+  facebook_link = db.Column(db.String(120), nullable=True)
+  image_link = db.Column(db.String(500), nullable=True)
+  website_link = db.Column(db.String(500), nullable=True)
+  looking_for_venues = db.Column(db.Boolean, default=False, nullable=True)
+  seeking_description = db.Column(db.String(500), nullable=True)
 
-    # TODO: implement any missing fields, as a database migration using Flask-Migrate
+  def __repr__(self):
+      return f'<Artist {self.id} {self.name}>'
 
-# TODO Implement Show and Artist models, and complete all model relationships and properties, as a database migration.
+class Show(db.Model):
+  __tablename__ = 'Show'
+
+  id = db.Column(db.Integer, primary_key=True)
+  artist_id = db.Column(db.Integer, db.ForeignKey('Artist.id'), nullable=False)
+  venue_id = db.Column(db.Integer, db.ForeignKey('Venue.id'), nullable=False)
+  start_time = db.Column(db.DateTime, nullable=False)
+
+  def __repr__(self):
+      return f'<Show {self.id}, Artist: {self.artist_id}, Venue: {self.venue_id}>'
 
 #----------------------------------------------------------------------------#
 # Filters.
@@ -175,7 +194,6 @@ def create_venue_submission():
       website_link = form.website_link.data
       looking_for_talent = form.seeking_talent.data
       seeking_description = form.seeking_description.data
-      app.logger.debug("DEBUG: Venue form submission " + venue)
 
       venue = Venue(
         name=name, 
