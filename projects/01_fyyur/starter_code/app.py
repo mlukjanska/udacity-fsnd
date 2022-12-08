@@ -183,7 +183,6 @@ def create_venue_submission():
   # TODO: modify data to be the data object returned from db insertion
   form = VenueForm()
   error = False
-  venue = {}
   venue_id = ''
   app.logger.debug("DEBUG: Venue form submission " + form.name.data)
   try:
@@ -227,9 +226,7 @@ def create_venue_submission():
           return render_template('errors/500.html')
       else:    
           flash("Venue '" + form.name.data + "' was successfully listed!")
-          # return render_template('pages/home.html')
-          # return render_template('pages/show_venue.html', venue=venue_data)
-          return show_venue(venue_id)
+          return redirect(url_for('show_venue', venue_id=venue_id))
 
 @app.route('/venues/<venue_id>', methods=['DELETE'])
 def delete_venue(venue_id):
