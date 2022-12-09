@@ -114,23 +114,33 @@ def venues():
   # TODO: replace with real venues data.
   #       num_upcoming_shows should be aggregated based on number of upcoming shows per venue.
   # cities = Venue.query.group_by(Venue.city, Venue.state)
+  error = False
   data = []
-  
-  places = Venue.query.distinct(
-      Venue.city,
-      Venue.state
-  ).order_by(
-      Venue.city.desc(), 
-      Venue.state.desc()
-  ).all()
-  for place in places:
-      item = {}
-      item['city'] = place.city
-      item['state'] = place.state
-      item['venues'] = Venue.query.filter_by(city=place.city).order_by('id').all()
-      item['num_upcoming_shows'] = 0
-      data.append(item)
-  return render_template('pages/venues.html', areas=data)
+  try: 
+    places = Venue.query.distinct(
+        Venue.city,
+        Venue.state
+    ).order_by(
+        Venue.city.desc(), 
+        Venue.state.desc()
+    ).all()
+    for place in places:
+        item = {}
+        item['city'] = place.city
+        item['state'] = place.state
+        item['venues'] = Venue.query.filter_by(city=place.city).order_by('id').all()
+        item['num_upcoming_shows'] = 0
+        data.append(item)
+  except:
+    error = True
+    print(sys.exc_info())
+  finally:
+    db.session.close()
+    if  error == True:
+      flash('An error occurred getting venues')
+      return render_template('errors/500.html')
+    else:    
+      return render_template('pages/venues.html', areas=data)
 
 @app.route('/venues/search', methods=['POST'])
 def search_venues():
