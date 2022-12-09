@@ -6,8 +6,8 @@
   "scripts": {
     "cy:run": "cypress run",
     "test": "npm run cy:run --headless",
-    "test:venues": "npm run cy:run --headless --spec 'tests/e2e/cypress/e2e/venues.cy.js'",
-    "test:artists": "npm run cy:run --headless --spec 'tests/e2e/cypress/e2e/artists.cy.js'",
+    "test:venues": "npm run cy:run -- --spec 'tests/e2e/cypress/e2e/venues.cy.js'",
+    "test:artists": "npm run cy:run -- --spec 'tests/e2e/cypress/e2e/artists.cy.js'",
     "test:cy:open": "npx cypress open"
   },
   "keywords": [],
