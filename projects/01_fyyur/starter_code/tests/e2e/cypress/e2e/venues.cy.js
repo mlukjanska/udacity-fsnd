@@ -54,8 +54,17 @@ describe('Venues', () => {
     cy.get('.items').should('contain.text', ctxVenue.name)
   })
   
-  it('should be possible to search for a venue in Venues page', () => {
-    const searchTerm = ctxVenue.name;
+  it('should be possible to search for a venue with uppercase in Venues page', () => {
+    const searchTerm = ctxVenue.name.toUpperCase();
+    const searchResultHeader = `Number of search results for "${searchTerm}": 1`
+    cy.visit('/venues')
+    cy.get('[name="search_term"]').type(`${searchTerm}{enter}`);
+    cy.get('h3').should('contain.text', searchResultHeader)
+    cy.get('.items').should('contain.text', ctxVenue.name)
+  })
+
+  it('should be possible to search for a venue with lowercase in Venues page', () => {
+    const searchTerm = ctxVenue.name.toLowerCase();
     const searchResultHeader = `Number of search results for "${searchTerm}": 1`
     cy.visit('/venues')
     cy.get('[name="search_term"]').type(`${searchTerm}{enter}`);
