@@ -128,8 +128,15 @@ def venues():
         item = {}
         item['city'] = place.city
         item['state'] = place.state
-        item['venues'] = Venue.query.filter_by(city=place.city).order_by('id').all()
-        item['num_upcoming_shows'] = 0
+        item['venues'] = []
+        venues = Venue.query.filter_by(city=place.city).order_by('id').all()
+        for venue in venues:
+          venue_item = {}
+          venue_item ['id'] = venue.id
+          venue_item ['name'] = venue.name
+          upcoming_shows = db.session.query(Show).filter_by(venue_id=venue.id).filter(Show.start_time >= datetime.now()).order_by('start_time').all()
+          venue_item['num_upcoming_shows'] = len(upcoming_shows)
+          item['venues'].append(venue_item)
         data.append(item)
   except:
     error = True
