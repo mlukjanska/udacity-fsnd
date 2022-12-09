@@ -175,8 +175,6 @@ def create_venue_form():
 
 @app.route('/venues/create', methods=['POST'])
 def create_venue_submission():
-  # TODO: insert form data as a new Venue record in the db, instead
-  # TODO: modify data to be the data object returned from db insertion
   form = VenueForm()
   error = False
   venue_id = ''
@@ -231,7 +229,24 @@ def delete_venue(venue_id):
 
   # BONUS CHALLENGE: Implement a button to delete a Venue on a Venue Page, have it so that
   # clicking that button delete it from the db then redirect the user to the homepage
-  return None
+  error = False
+  app.logger.debug("DEBUG: Delete Venue with id: " + venue_id)
+  try:
+      venue = Venue.query.get(venue_id) 
+      db.session.delete(venue)
+      db.session.commit()
+  except: 
+      error = True
+      db.session.rollback()
+      print(sys.exc_info())
+  finally:
+      db.session.close()
+      if  error == True:
+          flash("An error occurred. Venue with id '" + venue_id + "' could not be deleted.")
+          return render_template('errors/500.html')
+      else:    
+          flash("Venue '" + venue_id + "' was successfully deleted!")
+          return redirect(url_for('venues'))
 
 #  Artists
 #  ----------------------------------------------------------------
