@@ -181,8 +181,34 @@ def show_venue(venue_id):
   # shows the venue page with the given venue_id
   # TODO: replace with real venue data from the venues table, using venue_id
   error = False
+  data = {}
   try:
-    data = Venue.query.get(venue_id)
+    venue = Venue.query.get(venue_id)
+    past_shows = db.session.query(Show).filter_by(venue_id=venue_id).filter(Show.start_time < datetime.now()).order_by('start_time').all()
+    upcoming_shows = db.session.query(Show).filter_by(venue_id=venue_id).filter(Show.start_time >= datetime.now()).order_by('start_time').all()
+    data = {
+      "id": venue.id,
+      "name": venue.name,
+      "genres": venue.genres,
+      "address": venue.address,
+      "city": venue.city,
+      "state": venue.state,
+      "phone": venue.phone,
+      "website": venue.website_link,
+      "facebook_link": venue.facebook_link,
+      "seeking_talent": venue.looking_for_talent,
+      "seeking_description": venue.seeking_description,
+      "image_link": venue.image_link,
+      # "past_shows": [{
+      #   "artist_id": 4,
+      #   "artist_name": "Guns N Petals",
+      #   "artist_image_link": "https://images.unsplash.com/photo-1549213783-8284d0336c4f?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=300&q=80",
+      #   "start_time": "2019-05-21T21:30:00.000Z"
+      # }],
+      # "upcoming_shows": [],
+      "past_shows_count": len(past_shows),
+      "upcoming_shows_count": len(upcoming_shows),
+    }
   except:
     error = True
     print(sys.exc_info())

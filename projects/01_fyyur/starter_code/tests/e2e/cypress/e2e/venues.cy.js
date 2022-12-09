@@ -12,7 +12,11 @@ describe('Venues', () => {
 
   it('should be possible to create a venue with minimum data and be redirected to the newly created venue page', () => {
     const successAlert = `Venue '${ctxVenue.name}' was successfully listed!`
-
+    const upcomingShowsNum = 0
+    const pastShowsNum = 0
+    const upcomingShowsLabel = `${upcomingShowsNum} Upcoming Shows`
+    const pastShowsLabel = `${pastShowsNum} Upcoming Shows`
+    
     cy.visit('/')
     cy.get('[data-testid="post-venue"]').click()
     cy.get('[id="name"]').type(ctxVenue.name);
@@ -35,13 +39,15 @@ describe('Venues', () => {
     )
     cy.get('.row').should('contain.text', ctxVenue.city)
     cy.get('.row').should('contain.text', ctxVenue.state)
+    cy.get('h2').should('contain.text', upcomingShowsLabel)
+    cy.get('h2').should('contain.text', pastShowsLabel)
     cy.location().then((location) => {
       const splitUrl = location.pathname.split('/')
       ctxVenue.id = splitUrl[splitUrl.length-1]
     })
   })
 
-  it('should be possible to view Venues page and see newly created venue', () => {
+  it('should be possible to view Venues list page and see newly created venue in the list', () => {
     cy.visit('/venues')
     cy.get('[id="content"]').should('contain.text', ctxVenue.city)
     cy.get('[id="content"]').should('contain.text', ctxVenue.state)
