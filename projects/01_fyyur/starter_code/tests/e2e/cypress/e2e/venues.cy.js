@@ -13,9 +13,38 @@ describe('Venues', () => {
     cy.get('[name="search_term"]').type(ctxVenue);
   })
 
-  it.only('should be possible to create a venue and be redirected to the newly created venue page', () => {
+  it.only('should be possible to create a venue with minimum data and be redirected to the newly created venue page', () => {
+    const timestamp = getTimestamp();
+    const ctxVenue = {
+      name: `Venue ${timestamp}`,
+      city: 'Dallas',
+      state: 'TX',
+      genres: ['Alternative', 'Funk']
+    }
+    const successAlert = `Venue '${ctxVenue.name}' was successfully listed!`
+
     cy.visit('/')
     cy.get('[data-testid="post-venue"]').click()
+    cy.get('[id="name"]').type(ctxVenue.name);
+    cy.get('[id="city"]').type(ctxVenue.city);
+    cy.get('[id="state"]')
+      .select(ctxVenue.state)
+      .invoke('val')
+      .should('deep.equal', ctxVenue.state)
+    cy.get('[id="genres"]')
+      .select(ctxVenue.genres)
+      .invoke('val')
+      .should('deep.equal', ctxVenue.genres)
+    cy.get('form').submit()
+
+    cy.url().should('include', '/venues/') 
+    cy.get('.alert').should('contain.text', successAlert)
+    cy.get('h1').should('contain.text', ctxVenue.name)
+    ctxVenue.genres.forEach((genre) =>
+      cy.get('.genres').should('contain.text', genre)
+    )
+    cy.get('.row').should('contain.text', ctxVenue.city)
+    cy.get('.row').should('contain.text', ctxVenue.state)
   })
 
   it('should not be possible to submit an invalid venue form', () => {
