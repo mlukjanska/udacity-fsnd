@@ -222,31 +222,30 @@ def create_venue_submission():
           flash("Venue '" + form.name.data + "' was successfully listed!")
           return redirect(url_for('show_venue', venue_id=venue_id))
 
-@app.route('/venues/<venue_id>', methods=['DELETE'])
+# POST because then it is possible to return render home page
+# If keeping DELETE method then AJAX call needs to be done and rendering does not work 
+# the whole idea of AJAX in fact is not to rerender entire page
+@app.route('/venues/<int:venue_id>/delete', methods=['POST'])
 def delete_venue(venue_id):
-  # TODO: Complete this endpoint for taking a venue_id, and using
-  # SQLAlchemy ORM to delete a record. Handle cases where the session commit could fail.
-
-  # BONUS CHALLENGE: Implement a button to delete a Venue on a Venue Page, have it so that
-  # clicking that button delete it from the db then redirect the user to the homepage
   error = False
-  app.logger.debug("DEBUG: Delete Venue with id: " + venue_id)
   try:
-      venue = Venue.query.get(venue_id) 
-      db.session.delete(venue)
-      db.session.commit()
+    venue = Venue.query.get(venue_id) 
+    db.session.delete(venue)
+    db.session.commit()
   except: 
-      error = True
-      db.session.rollback()
-      print(sys.exc_info())
+    error = True
+    db.session.rollback()
+    print(sys.exc_info())
   finally:
-      db.session.close()
-      if  error == True:
-          flash("An error occurred. Venue with id '" + venue_id + "' could not be deleted.")
-          return render_template('errors/500.html')
-      else:    
-          flash("Venue '" + venue_id + "' was successfully deleted!")
-          return redirect(url_for('venues'))
+    db.session.close()
+    if  error == True:
+      app.logger.debug("Error deleting Venue with id: " + str(venue_id))
+      flash("An error occurred. Venue with id '" + str(venue_id) + "' could not be deleted.")
+      return render_template('errors/500.html')
+    else:    
+      app.logger.debug("Successfully delete Venue with id: " + str(venue_id))
+      flash("Venue '" + str(venue_id) + "' was successfully deleted!")
+      return redirect(url_for('index'))
 
 #  Artists
 #  ----------------------------------------------------------------

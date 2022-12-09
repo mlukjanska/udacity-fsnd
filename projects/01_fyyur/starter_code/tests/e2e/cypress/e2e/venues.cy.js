@@ -1,27 +1,16 @@
 import { getTimestamp } from '../support/helpers';
 
 describe('Venues', () => {
+  const timestamp = getTimestamp();
+  const ctxVenue = {
+    name: `Venue ${timestamp}`,
+    city: 'Dallas',
+    state: 'TX',
+    genres: ['Alternative', 'Funk'],
+    id: ''
+  }
 
-  it('should be possible to view Venues page', () => {
-    cy.visit('/venues')
-  })
-  
-  it('should be possible to search for a venue in Venues page', () => {
-    const timestamp = getTimestamp();
-    const ctxVenue = `Venue ${timestamp}`
-    cy.visit('/venues')
-    cy.get('[name="search_term"]').type(ctxVenue);
-  })
-
-  it.only('should be possible to create a venue with minimum data and be redirected to the newly created venue page', () => {
-
-    const timestamp = getTimestamp();
-    const ctxVenue = {
-      name: `Venue ${timestamp}`,
-      city: 'Dallas',
-      state: 'TX',
-      genres: ['Alternative', 'Funk']
-    }
+  it('should be possible to create a venue with minimum data and be redirected to the newly created venue page', () => {
     const successAlert = `Venue '${ctxVenue.name}' was successfully listed!`
 
     cy.visit('/')
@@ -46,21 +35,53 @@ describe('Venues', () => {
     )
     cy.get('.row').should('contain.text', ctxVenue.city)
     cy.get('.row').should('contain.text', ctxVenue.state)
-
-    // Delete the venue after test finished
     cy.location().then((location) => {
       const splitUrl = location.pathname.split('/')
-      const venueId = splitUrl[splitUrl.length-1]
-      cy.request('DELETE', `/venues/${venueId}`).then((resp) => expect(resp.status).to.eq(200))
+      ctxVenue.id = splitUrl[splitUrl.length-1]
     })
+  })
+
+  it('should be possible to view Venues page and see newly created venue', () => {
+    cy.visit('/venues')
+    cy.get('[id="content"]').should('contain.text', ctxVenue.city)
+    cy.get('[id="content"]').should('contain.text', ctxVenue.state)
+    cy.get('.items').should('contain.text', ctxVenue.name)
+  })
+  
+  it('should be possible to search for a venue in Venues page', () => {
+    const timestamp = getTimestamp();
+    const ctxVenue = `Venue ${timestamp}`
+    cy.visit('/venues')
+    cy.get('[name="search_term"]').type(ctxVenue);
+  })
+
+  it('should be possible to delete a venue', () => {
+    const successAlert = `Venue '${ctxVenue.id}' was successfully deleted!`
+    cy.visit(`/venues/${ctxVenue.id}`)
+    cy.get('[data-testid="delete-venue-button"]').click()
+    cy.get('.alert').should('contain.text', successAlert)
+    ctxVenue.id = '';
+    cy.location('pathname').should('eq', '/')
   })
 
   it('should not be possible to submit an invalid venue form', () => {
     cy.visit('/venues/create')
+    // TODO add validation also on form submit (clicking enter)
+    // cy.get('form').submit()
+    cy.get('[data-testid="create-venue-button"').click()
+    // missing all fields
+    cy.location('pathname').should('eq', '/venues/create')
+
+    // missing name 
     // using an invalid State enum, 
     // missing city 
-    // missing name 
     // missing genre
   })
 
+  after('delete venue', () => {
+    // Delete the venue after test finished
+    if (ctxVenue.id) {
+      cy.request('POST', `/venues/${ctxVenue.id}/delete`).then((resp) => expect(resp.status).to.eq(200))
+    }
+  })
 })

@@ -4,7 +4,10 @@
   "description": "Fyyur -----",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "cy:run": "cypress run",
+    "test": "npm run cy:run --headless",
+    "test:venues": "npm run cy:run --headless --spec 'tests/e2e/cypress/e2e/venues.cy.js'",
+    "test:artists": "npm run cy:run --headless --spec 'tests/e2e/cypress/e2e/artists.cy.js'",
     "test:cy:open": "npx cypress open"
   },
   "keywords": [],

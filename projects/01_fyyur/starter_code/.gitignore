@@ -315,3 +315,8 @@ poetry.toml
 
 
 # End of https://www.toptal.com/developers/gitignore/api/python
+
+
+# Cypress
+/tests/e2e/cypress/screenshots/*
+/tests/e2e/cypress/videos/*
