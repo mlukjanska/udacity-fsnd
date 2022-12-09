@@ -336,15 +336,31 @@ def search_artists():
   # TODO: implement search on artists with partial string search. Ensure it is case-insensitive.
   # seach for "A" should return "Guns N Petals", "Matt Quevado", and "The Wild Sax Band".
   # search for "band" should return "The Wild Sax Band".
-  response={
-    "count": 1,
-    "data": [{
-      "id": 4,
-      "name": "Guns N Petals",
-      "num_upcoming_shows": 0,
-    }]
-  }
-  return render_template('pages/search_artists.html', results=response, search_term=request.form.get('search_term', ''))
+  error = False
+  search_term = request.form.get('search_term', '')
+  data = []
+  try:
+    artists = Artist.query.filter(Artist.name.ilike(f'%{search_term}%')).all()
+    for artist in artists:
+      item = {}
+      item['id'] = artist.id
+      item['name'] = artist.name
+      item['num_upcoming_shows'] = 0
+      data.append(item)
+    response={
+        "count": len(artists),
+        "data": data
+    }
+  except:
+    error = True
+    print(sys.exc_info())
+  finally:
+    db.session.close()
+    if  error == True:
+      flash('An error occurred getting search results for term: ' + request.form.get('search_term', ''))
+      return render_template('errors/500.html')
+    else:    
+      return render_template('pages/search_artists.html', results=response, search_term=request.form.get('search_term', ''))
 
 @app.route('/artists/<int:artist_id>')
 def show_artist(artist_id):
@@ -497,16 +513,6 @@ def create_artist_submission():
       else:    
           flash("Artist '" + form.name.data + "' was successfully listed!")
           return redirect(url_for('show_artist', artist_id=artist_id))
-  # # called upon submitting the new artist listing form
-  # # TODO: insert form data as a new Venue record in the db, instead
-  # # TODO: modify data to be the data object returned from db insertion
-
-  # # on successful db insert, flash success
-  # flash('Artist ' + request.form['name'] + ' was successfully listed!')
-  # # TODO: on unsuccessful db insert, flash an error instead.
-  # # e.g., flash('An error occurred. Artist ' + data.name + ' could not be listed.')
-  # return render_template('pages/home.html')
-
 
 #  Shows
 #  ----------------------------------------------------------------

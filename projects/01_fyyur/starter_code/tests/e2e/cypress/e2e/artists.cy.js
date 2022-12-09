@@ -52,4 +52,22 @@ describe('Artists', () => {
     cy.get('.items').should('contain.text', ctxArtist.name)
   })
 
+  it('should be possible to search for an artist with uppercase in Artists page', () => {
+    const searchTerm = ctxArtist.name.toUpperCase();
+    const searchResultHeader = `Number of search results for "${searchTerm}": 1`
+    cy.visit('/artists')
+    cy.get('[name="search_term"]').type(`${searchTerm}{enter}`);
+    cy.get('h3').should('contain.text', searchResultHeader)
+    cy.get('.items').should('contain.text', ctxArtist.name)
+  })
+
+  it('should be possible to search for a artist with lowercase in Artists page', () => {
+    const searchTerm = ctxArtist.name.toLowerCase();
+    const searchResultHeader = `Number of search results for "${searchTerm}": 1`
+    cy.visit('/artists')
+    cy.get('[name="search_term"]').type(`${searchTerm}{enter}`);
+    cy.get('h3').should('contain.text', searchResultHeader)
+    cy.get('.items').should('contain.text', ctxArtist.name)
+  })
+
 })
