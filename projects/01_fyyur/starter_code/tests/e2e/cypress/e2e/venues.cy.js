@@ -49,10 +49,12 @@ describe('Venues', () => {
   })
   
   it('should be possible to search for a venue in Venues page', () => {
-    const timestamp = getTimestamp();
-    const ctxVenue = `Venue ${timestamp}`
+    const searchTerm = ctxVenue.name;
+    const searchResultHeader = `Number of search results for "${searchTerm}": 1`
     cy.visit('/venues')
-    cy.get('[name="search_term"]').type(ctxVenue);
+    cy.get('[name="search_term"]').type(`${searchTerm}{enter}`);
+    cy.get('h3').should('contain.text', searchResultHeader)
+    cy.get('.items').should('contain.text', ctxVenue.name)
   })
 
   it('should be possible to delete a venue', () => {
