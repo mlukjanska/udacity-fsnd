@@ -9,13 +9,13 @@ describe('Artists', () => {
     genres: ['Alternative', 'Funk'],
     id: ''
   }
+  const upcomingShowsNum = 0
+  const pastShowsNum = 0
+  const upcomingShowsLabel = `${upcomingShowsNum} Upcoming Shows`
+  const pastShowsLabel = `${pastShowsNum} Upcoming Shows`
 
-  it('should be possible to create an artist entry with minimum data and be redirected to the newly created artist page', () => {
+  it.only('should be possible to create an artist entry with minimum data and be redirected to the newly created artist page', () => {
     const successAlert = `Artist '${ctxArtist.name}' was successfully listed!`
-    const upcomingShowsNum = 0
-    const pastShowsNum = 0
-    const upcomingShowsLabel = `${upcomingShowsNum} Upcoming Shows`
-    const pastShowsLabel = `${pastShowsNum} Upcoming Shows`
     
     cy.visit('/')
     cy.get('[data-testid="post-artist"]').click()
@@ -32,19 +32,8 @@ describe('Artists', () => {
     cy.get('form').submit()
 
     cy.url().as('newArtistUrl').should('include', '/artists/') 
-    cy.get('.alert').should('contain.text', successAlert)
-    cy.get('h1').should('contain.text', ctxArtist.name)
-    ctxArtist.genres.forEach((genre) =>
-      cy.get('.genres').should('contain.text', genre)
-    )
-    cy.get('.row').should('contain.text', ctxArtist.city)
-    cy.get('.row').should('contain.text', ctxArtist.state)
-    cy.get('h2').should('contain.text', upcomingShowsLabel)
-    cy.get('h2').should('contain.text', pastShowsLabel)
-    cy.location().then((location) => {
-      const splitUrl = location.pathname.split('/')
-      ctxArtist.id = splitUrl[splitUrl.length-1]
-    })
+    checkNotification(successAlert);
+    checkArtistFields(ctxArtist, upcomingShowsLabel, pastShowsLabel);
   })
 
   it('should be possible to view Artists list page and see newly created artist in the list', () => {
@@ -70,4 +59,43 @@ describe('Artists', () => {
     cy.get('.items').should('contain.text', ctxArtist.name)
   })
 
+  it.only('should be possible to edit artist', () => {
+    const editFormHeading = `Edit artist ${ctxArtist.name}`
+    cy.visit(`/artists/${ctxArtist.id}`)
+    cy.get('[data-testid="edit-artist-button"]').click()
+    cy.get('h3.form-heading').should('contain.text', editFormHeading)
+    cy.get('[id="name"]').should('have.value', ctxArtist.name)
+    cy.get('[id="city"]').should('have.value', ctxArtist.city)
+    cy.get('[id="state"]').invoke('val').should('deep.equal', ctxArtist.state)
+    cy.get('[id="genres"]').invoke('val').should('deep.equal', ctxArtist.genres)
+
+    ctxArtist.name = `${ctxArtist.name} Edited`
+    ctxArtist.city = `${ctxArtist.city} Edited`
+    const successAlert = `Artist '${ctxArtist.name}' was successfully edited!`
+
+    cy.get('[id="name"]').clear().type(ctxArtist.name);
+    cy.get('[id="city"]').clear().type(ctxArtist.city);
+
+    cy.get('[data-testid="post-edited-artist"]').click()
+    checkNotification(successAlert);
+    checkArtistFields(ctxArtist, upcomingShowsLabel, pastShowsLabel);
+  })
 })
+
+function checkNotification(successAlert) {
+  cy.get('.alert').should('contain.text', successAlert);
+}
+
+function checkArtistFields(artist, upcomingShowsLabel, pastShowsLabel) {
+  cy.get('h1').should('contain.text', artist.name);
+  artist.genres.forEach((genre) => cy.get('.genres').should('contain.text', genre)
+  );
+  cy.get('.row').should('contain.text', artist.city);
+  cy.get('.row').should('contain.text', artist.state);
+  cy.get('h2').should('contain.text', upcomingShowsLabel);
+  cy.get('h2').should('contain.text', pastShowsLabel);
+  cy.location().then((location) => {
+    const splitUrl = location.pathname.split('/');
+    artist.id = splitUrl[splitUrl.length - 1];
+  });
+}
