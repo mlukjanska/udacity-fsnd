@@ -33,7 +33,11 @@ describe('Venues', () => {
       .should('deep.equal', ctxVenue.genres)
     cy.get('form').submit()
 
-    cy.url().as('newVenueUrl').should('include', '/venues/') 
+    cy.url().as('newVenueUrl').should('include', '/venues/')
+    cy.location().then((location) => {
+      const splitUrl = location.pathname.split('/');
+      ctxVenue.id = splitUrl[splitUrl.length - 1];
+    });
     checkNotification(successAlert);
     checkVenueFields(ctxVenue, upcomingShowsLabel, pastShowsLabel);
   })
@@ -129,8 +133,4 @@ function checkVenueFields(venue, upcomingShowsLabel, pastShowsLabel) {
   cy.get('.row').should('contain.text', venue.state);
   cy.get('h2').should('contain.text', upcomingShowsLabel);
   cy.get('h2').should('contain.text', pastShowsLabel);
-  cy.location().then((location) => {
-    const splitUrl = location.pathname.split('/');
-    venue.id = splitUrl[splitUrl.length - 1];
-  });
 }

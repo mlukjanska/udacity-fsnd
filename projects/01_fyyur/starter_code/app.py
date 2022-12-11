@@ -648,23 +648,17 @@ def shows():
   error = False
   data = []
   try: 
-    # shows = Show.query.all()
-    # shows = db.session.query(Show).join(Venue).join(Artist).all()
-    query = db.session.query(Venue.id, Venue.name, Artist.id, Artist.name, Artist.image_link, Show.start_time
-      ).select_from(Show
-      ).join(Venue, Show.venue_id==Venue.id
-      ).join(Artist, Show.artist_id==Artist.id
-      ).order_by('id')
-    shows = query.all()
+    shows = Show.query.all()
     for show in shows:
-      item = {}
-      item['venue_id'] = show.Venue.id
-      item['venue_name'] = show.venue_name
-      item['artist_id'] = show.artist_id
-      # item['artist_name'] = show.artist_name
-      # item['artist_image_link'] = show.artist_image_link
-      item['start_time'] = str(show.start_time)
-      data.append(item)
+      data_item = {
+        'venue_id': show.venue.id,
+        'venue_name': show.venue.name,
+        'artist_id': show.artist.id,
+        'artist_name': show.artist.name,
+        'artist_image_link': show.artist.image_link,
+        'start_time': show.start_time.strftime("%m/%d/%Y, %H:%M"),
+      }
+      data.append(data_item)
   except:
     error = True
     print(sys.exc_info())
@@ -675,11 +669,6 @@ def shows():
       return render_template('errors/500.html')
     else:    
       return render_template('pages/shows.html', shows=data)
-  # displays list of shows at /shows
-  # TODO: replace with real venues data.
-  # data = []
-
-  # return render_template('pages/shows.html', shows=data)
 
 @app.route('/shows/create')
 def create_shows():

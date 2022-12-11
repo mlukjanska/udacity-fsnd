@@ -31,7 +31,11 @@ describe('Artists', () => {
       .should('deep.equal', ctxArtist.genres)
     cy.get('form').submit()
 
-    cy.url().as('newArtistUrl').should('include', '/artists/') 
+    cy.url().as('newArtistUrl').should('include', '/artists/')
+    cy.location().then((location) => {
+      const splitUrl = location.pathname.split('/');
+      ctxArtist.id = splitUrl[splitUrl.length - 1];
+    });
     checkNotification(successAlert);
     checkArtistFields(ctxArtist, upcomingShowsLabel, pastShowsLabel);
   })
@@ -110,8 +114,4 @@ function checkArtistFields(artist, upcomingShowsLabel, pastShowsLabel) {
   cy.get('.row').should('contain.text', artist.state);
   cy.get('h2').should('contain.text', upcomingShowsLabel);
   cy.get('h2').should('contain.text', pastShowsLabel);
-  cy.location().then((location) => {
-    const splitUrl = location.pathname.split('/');
-    artist.id = splitUrl[splitUrl.length - 1];
-  });
 }

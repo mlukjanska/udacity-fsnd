@@ -8,6 +8,7 @@
     "test": "npm run cy:run --headless",
     "test:venues": "npm run cy:run -- --spec 'tests/e2e/cypress/e2e/venues.cy.js'",
     "test:artists": "npm run cy:run -- --spec 'tests/e2e/cypress/e2e/artists.cy.js'",
+    "test:add-mocks": "npm run cy:run -- --spec 'tests/e2e/cypress/e2e/add-mocked-data.cy.js'",
     "test:cy:open": "npx cypress open"
   },
   "keywords": [],
