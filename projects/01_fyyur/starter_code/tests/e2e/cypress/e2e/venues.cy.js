@@ -104,17 +104,12 @@ describe('Venues', () => {
   })
 
   it('should not be possible to submit an invalid venue form', () => {
+    const errorAlert = "Errors ['name This field is required.', 'city This field is required.', 'address This field is required.', 'genres This field is required.']"
     cy.visit('/venues/create')
-    // TODO add validation also on form submit (clicking enter)
-    // cy.get('form').submit()
-    cy.get('[data-testid="create-venue-button"').click()
+    cy.get('form').submit()
     // missing all fields
     cy.location('pathname').should('eq', '/venues/create')
-
-    // missing name 
-    // using an invalid State enum, 
-    // missing city 
-    // missing genre
+    checkNotification(errorAlert)
   })
 
   after('delete venue', () => {
@@ -125,8 +120,8 @@ describe('Venues', () => {
   })
 })
 
-function checkNotification(successAlert) {
-  cy.get('.alert').should('contain.text', successAlert);
+function checkNotification(alert) {
+  cy.get('.alert').should('contain.text', alert);
 }
 
 function checkVenueFields(venue, upcomingShowsLabel, pastShowsLabel) {

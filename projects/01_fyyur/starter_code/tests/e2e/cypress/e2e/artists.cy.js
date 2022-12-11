@@ -98,6 +98,15 @@ describe('Artists', () => {
     cy.location('pathname').should('eq', '/')
   })
   
+  it('should not be possible to submit an invalid artist form', () => {
+    const errorAlert = "Errors ['name This field is required.', 'city This field is required.', 'genres This field is required.']"
+    cy.visit('/artists/create')
+    cy.get('form').submit()
+    // missing all fields
+    cy.location('pathname').should('eq', '/artists/create')
+    checkNotification(errorAlert)
+  })
+
   after('delete artist', () => {
     // Delete the artist after test finished
     if (ctxArtist.id) {
@@ -106,8 +115,8 @@ describe('Artists', () => {
   })
 })
 
-function checkNotification(successAlert) {
-  cy.get('.alert').should('contain.text', successAlert);
+function checkNotification(alert) {
+  cy.get('.alert').should('contain.text', alert);
 }
 
 function checkArtistFields(artist, upcomingShowsLabel, pastShowsLabel) {

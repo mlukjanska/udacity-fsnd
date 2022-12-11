@@ -259,52 +259,61 @@ def create_venue_form():
 
 @app.route('/venues/create', methods=['POST'])
 def create_venue_submission():
-  form = VenueForm()
+  form = VenueForm(request.form, meta={'csrf': False})
   error = False
   venue_id = ''
   app.logger.debug("Venue form submission " + form.name.data)
-  try:
-      name = form.name.data
-      city = form.city.data
-      state = form.state.data
-      address = form.address.data
-      phone = form.phone.data
-      genres = form.genres.data
-      facebook_link = form.facebook_link.data
-      image_link = form.image_link.data
-      website_link = form.website_link.data
-      looking_for_talent = form.seeking_talent.data
-      seeking_description = form.seeking_description.data
+  if form.validate():
+    app.logger.debug("Form is valid for '" + form.name.data + "'.")
+    try:
+        name = form.name.data
+        city = form.city.data
+        state = form.state.data
+        address = form.address.data
+        phone = form.phone.data
+        genres = form.genres.data
+        facebook_link = form.facebook_link.data
+        image_link = form.image_link.data
+        website_link = form.website_link.data
+        looking_for_talent = form.seeking_talent.data
+        seeking_description = form.seeking_description.data
 
-      venue = Venue(
-        name=name, 
-        city=city, 
-        state=state, 
-        address=address,
-        phone=phone,
-        genres=genres,
-        facebook_link=facebook_link,
-        image_link=image_link,
-        website_link=website_link,
-        looking_for_talent=looking_for_talent,
-        seeking_description=seeking_description)
+        venue = Venue(
+          name=name, 
+          city=city, 
+          state=state, 
+          address=address,
+          phone=phone,
+          genres=genres,
+          facebook_link=facebook_link,
+          image_link=image_link,
+          website_link=website_link,
+          looking_for_talent=looking_for_talent,
+          seeking_description=seeking_description)
 
-      db.session.add(venue)
-      db.session.commit()
-      app.logger.debug("Commited to DB venue_id '" + str(venue.id) + "'.")
-      venue_id = venue.id
-  except:
-      error = True
-      db.session.rollback()
-      print(sys.exc_info())
-  finally:
-      db.session.close()
-      if  error == True:
-          flash("An error occurred. Venue '" + form.name.data + "' could not be listed.")
-          return render_template('errors/500.html')
-      else:    
-          flash("Venue '" + form.name.data + "' was successfully listed!")
-          return redirect(url_for('show_venue', venue_id=venue_id))
+        db.session.add(venue)
+        db.session.commit()
+        app.logger.debug("Commited to DB venue_id '" + str(venue.id) + "'.")
+        venue_id = venue.id
+    except:
+        error = True
+        db.session.rollback()
+        print(sys.exc_info())
+    finally:
+        db.session.close()
+        if  error == True:
+            flash("An error occurred. Venue '" + form.name.data + "' could not be listed.")
+            return render_template('errors/500.html')
+        else:    
+            flash("Venue '" + form.name.data + "' was successfully listed!")
+            return redirect(url_for('show_venue', venue_id=venue_id))
+  else:
+      message = []
+      for field, err in form.errors.items():
+          message.append(field + ' ' + '|'.join(err))
+      flash('Errors ' + str(message))
+      return render_template('errors/500.html')
+
 
 # POST because then it is possible to return render home page
 # If keeping DELETE method then AJAX call needs to be done and rendering does not work 
@@ -579,50 +588,59 @@ def create_artist_form():
 
 @app.route('/artists/create', methods=['POST'])
 def create_artist_submission():
-  form = ArtistForm()
+  form = ArtistForm(request.form, meta={'csrf': False})
   error = False
   artist_id = ''
   app.logger.debug("Artist form submission " + form.name.data)
-  try:
-      name = form.name.data
-      city = form.city.data
-      state = form.state.data
-      phone = form.phone.data
-      genres = form.genres.data
-      facebook_link = form.facebook_link.data
-      image_link = form.image_link.data
-      website_link = form.website_link.data
-      looking_for_venues = form.seeking_venue.data
-      seeking_description = form.seeking_description.data
+  if form.validate():
+    app.logger.debug("Form is valid for '" + form.name.data + "'.")
+ 
+    try:
+        name = form.name.data
+        city = form.city.data
+        state = form.state.data
+        phone = form.phone.data
+        genres = form.genres.data
+        facebook_link = form.facebook_link.data
+        image_link = form.image_link.data
+        website_link = form.website_link.data
+        looking_for_venues = form.seeking_venue.data
+        seeking_description = form.seeking_description.data
 
-      artist = Artist(
-        name=name, 
-        city=city, 
-        state=state, 
-        phone=phone,
-        genres=genres,
-        facebook_link=facebook_link,
-        image_link=image_link,
-        website_link=website_link,
-        looking_for_venues=looking_for_venues,
-        seeking_description=seeking_description)
+        artist = Artist(
+          name=name, 
+          city=city, 
+          state=state, 
+          phone=phone,
+          genres=genres,
+          facebook_link=facebook_link,
+          image_link=image_link,
+          website_link=website_link,
+          looking_for_venues=looking_for_venues,
+          seeking_description=seeking_description)
 
-      db.session.add(artist)
-      db.session.commit()
-      app.logger.debug("Commited to DB artist_id '" + str(artist.id) + "'.")
-      artist_id = artist.id
-  except:
-      error = True
-      db.session.rollback()
-      print(sys.exc_info())
-  finally:
-      db.session.close()
-      if  error == True:
-          flash("An error occurred. Artist '" + form.name.data + "' could not be listed.")
-          return render_template('errors/500.html')
-      else:    
-          flash("Artist '" + form.name.data + "' was successfully listed!")
-          return redirect(url_for('show_artist', artist_id=artist_id))
+        db.session.add(artist)
+        db.session.commit()
+        app.logger.debug("Commited to DB artist_id '" + str(artist.id) + "'.")
+        artist_id = artist.id
+    except:
+        error = True
+        db.session.rollback()
+        print(sys.exc_info())
+    finally:
+        db.session.close()
+        if  error == True:
+            flash("An error occurred. Artist '" + form.name.data + "' could not be listed.")
+            return render_template('errors/500.html')
+        else:    
+            flash("Artist '" + form.name.data + "' was successfully listed!")
+            return redirect(url_for('show_artist', artist_id=artist_id))
+  else:
+      message = []
+      for field, err in form.errors.items():
+          message.append(field + ' ' + '|'.join(err))
+      flash('Errors ' + str(message))
+      return render_template('errors/500.html')
 
 #  Shows
 #  ----------------------------------------------------------------
@@ -661,36 +679,43 @@ def create_shows():
 
 @app.route('/shows/create', methods=['POST'])
 def create_show_submission():
-  form = ShowForm()
+  form = ShowForm(request.form, meta={'csrf': False})
   error = False
   show_id = ''
   app.logger.debug("Shows form submission with artist id '" + form.artist_id.data + "' and venue id '" + form.venue_id.data + "'.")
-  try:
-    artist_id = form.artist_id.data
-    venue_id = form.venue_id.data
-    start_time = form.start_time.data
+  if form.validate():
+    try:
+      artist_id = form.artist_id.data
+      venue_id = form.venue_id.data
+      start_time = form.start_time.data
 
-    show = Show(
-      artist_id = artist_id,
-      venue_id = venue_id,
-      start_time = start_time
-    )
-    db.session.add(show)
-    db.session.commit()
-    app.logger.debug("Commited to DB show_id '" + str(show_id) + "'.")
-    show_id = show.id
-  except:
-      error = True
-      db.session.rollback()
-      print(sys.exc_info())
-  finally:
-      db.session.close()
-      if  error == True:
-          flash("An error occurred. Show with artist id '" + form.artist_id.data + "' and venue id '" + form.venue_id.data +  "' could not be listed.")
-          return render_template('errors/500.html')
-      else:    
-          flash("Show with artist id '" + form.artist_id.data + "' and venue id '" + form.venue_id.data + "' was successfully listed!")
-          return redirect(url_for('shows'))
+      show = Show(
+        artist_id = artist_id,
+        venue_id = venue_id,
+        start_time = start_time
+      )
+      db.session.add(show)
+      db.session.commit()
+      app.logger.debug("Commited to DB show_id '" + str(show_id) + "'.")
+      show_id = show.id
+    except:
+        error = True
+        db.session.rollback()
+        print(sys.exc_info())
+    finally:
+        db.session.close()
+        if  error == True:
+            flash("An error occurred. Show with artist id '" + form.artist_id.data + "' and venue id '" + form.venue_id.data +  "' could not be listed.")
+            return render_template('errors/500.html')
+        else:    
+            flash("Show with artist id '" + form.artist_id.data + "' and venue id '" + form.venue_id.data + "' was successfully listed!")
+            return redirect(url_for('shows'))
+  else:
+      message = []
+      for field, err in form.errors.items():
+          message.append(field + ' ' + '|'.join(err))
+      flash('Errors ' + str(message))
+      return render_template('errors/500.html')
 
 @app.errorhandler(404)
 def not_found_error(error):
