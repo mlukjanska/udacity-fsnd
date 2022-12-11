@@ -1,5 +1,9 @@
 import { getTimestamp } from '../support/helpers';
 
+/**
+ * Note: The tests can be further enhanced to be isolated, currently they should be run in sequence
+ */
+
 describe('Venues', () => {
   const timestamp = getTimestamp();
   const ctxVenue = {

@@ -5,7 +5,7 @@
 import sys
 import dateutil.parser
 import babel
-from flask import Flask, render_template, request, Response, flash, redirect, url_for
+from flask import Flask, render_template, request, flash, redirect, url_for
 from flask_moment import Moment
 from flask_migrate import Migrate
 from flask_sqlalchemy import SQLAlchemy
@@ -161,9 +161,6 @@ def venues():
 
 @app.route('/venues/search', methods=['POST'])
 def search_venues():
-  # TODO: implement search on venues with partial string search. Ensure it is case-insensitive.
-  # seach for Hop should return "The Musical Hop".
-  # search for "Music" should return "The Musical Hop" and "Park Square Live Music & Coffee"
   error = False
   search_term = request.form.get('search_term', '')
   data = []
@@ -386,21 +383,12 @@ def artists():
       
 @app.route('/artists/search', methods=['POST'])
 def search_artists():
-  # TODO: implement search on artists with partial string search. Ensure it is case-insensitive.
-  # seach for "A" should return "Guns N Petals", "Matt Quevado", and "The Wild Sax Band".
-  # search for "band" should return "The Wild Sax Band".
   error = False
   search_term = request.form.get('search_term', '')
   data = []
   try:
     artists = Artist.query.filter(Artist.name.ilike(f'%{search_term}%')).all()
     for artist in artists:
-      # num_upcoming_shows = len(artist.shows)
-      # num_upcoming_shows = artist.shows.filter(Show.start_time < datetime.now()).count()
-      # num_upcoming_shows = 0
-      # for show in artist.shows:
-      #   if show.start_time > datetime.now():
-      #     num_upcoming_shows+=1
       artist_item = {
         'id': artist.id,
         'name': artist.name,
@@ -424,14 +412,10 @@ def search_artists():
 
 @app.route('/artists/<int:artist_id>')
 def show_artist(artist_id):
-  # shows the artist page with the given artist_id
-  # TODO: replace with real artist data from the artist table, using artist_id
   error = False
   data = {}
   try:
     artist = Artist.query.get_or_404(artist_id)
-    # past_shows = db.session.query(Show).filter_by(artist_id=artist_id).filter(Show.start_time < datetime.now()).order_by('start_time').all()
-    # upcoming_shows = db.session.query(Show).filter_by(artist_id=artist_id).filter(Show.start_time >= datetime.now()).order_by('start_time').all()
     app.logger.debug("Retrieved artist id: '" + str(artist.id) + "'.")
     past_shows = []
     upcoming_shows = []
@@ -680,7 +664,7 @@ def create_show_submission():
   form = ShowForm()
   error = False
   show_id = ''
-  app.logger.debug("Shows form submission with artist id'" + form.artist_id.data + "' and venue id '" + form.venue_id.data + "'.")
+  app.logger.debug("Shows form submission with artist id '" + form.artist_id.data + "' and venue id '" + form.venue_id.data + "'.")
   try:
     artist_id = form.artist_id.data
     venue_id = form.venue_id.data
@@ -702,10 +686,10 @@ def create_show_submission():
   finally:
       db.session.close()
       if  error == True:
-          flash("An error occurred. Show with artist id'" + form.artist_id.data + "' and venue id '" + form.venue_id.data +  "' could not be listed.")
+          flash("An error occurred. Show with artist id '" + form.artist_id.data + "' and venue id '" + form.venue_id.data +  "' could not be listed.")
           return render_template('errors/500.html')
       else:    
-          flash("Show with artist id'" + form.artist_id.data + "' and venue id '" + form.venue_id.data + "' was successfully listed!")
+          flash("Show with artist id '" + form.artist_id.data + "' and venue id '" + form.venue_id.data + "' was successfully listed!")
           return redirect(url_for('shows'))
 
 @app.errorhandler(404)
