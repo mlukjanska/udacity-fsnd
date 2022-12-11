@@ -171,8 +171,9 @@ source env/Scripts/activate
 pip install -r requirements.txt
 ```
 
-5. **Run the development server:**
+5. **Run the development server and DB:**
 ```
+docker-compose up
 export FLASK_APP=myapp
 export FLASK_ENV=development # enables debug mode
 python3 app.py
@@ -181,3 +182,17 @@ python3 app.py
 6. **Verify on the Browser**<br>
 Navigate to project homepage [http://127.0.0.1:5000/](http://127.0.0.1:5000/) or [http://localhost:5000](http://localhost:5000) 
 
+7. **Install web dependencies**<br>
+```
+npm install
+```
+
+8. **Run e2e tests**<br>
+```
+npm run test
+```
+
+9. **Populate DB with mock data**<br>
+```
+npm run test:add-mocks
+```
