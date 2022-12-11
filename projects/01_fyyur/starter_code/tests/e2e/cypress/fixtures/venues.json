@@ -1,7 +1,7 @@
 [{
   "id": 1,
   "name": "The Musical Hop",
-  "genres": ["Jazz", "Reggae", "Swing", "Classical", "Folk"],
+  "genres": "Folk",
   "address": "1015 Folsom Street",
   "city": "San Francisco",
   "state": "CA",
@@ -15,7 +15,7 @@
   {
     "id": 2,
     "name": "The Dueling Pianos Bar",
-    "genres": ["Classical", "R&B", "Hip-Hop"],
+    "genres": "R&B",
     "address": "335 Delancey Street",
     "city": "New York",
     "state": "NY",
@@ -28,7 +28,7 @@
   {
     "id": 3,
     "name": "Park Square Live Music & Coffee",
-    "genres": ["Rock n Roll", "Jazz", "Classical", "Folk"],
+    "genres": "Rock n Roll",
     "address": "34 Whiskey Moore Ave",
     "city": "San Francisco",
     "state": "CA",

@@ -2,6 +2,12 @@ import artists from '../fixtures/artists.json'
 import venues from '../fixtures/venues.json'
 import shows from '../fixtures/shows.json'
 
+/**
+ * Limitation in Cypress request to send multiple values with the same key in POST FormData
+ * https://github.com/cypress-io/cypress/issues/17921
+ * Hence modified the mocked data to have only a single genre
+ */
+
 const ctxArtists = []
 const ctxVenues = []
 
@@ -14,7 +20,8 @@ describe('Setup mocked data', () => {
         url: '/artists/create', // baseUrl is prepend to URL
         form: true, // indicates the body should be form urlencoded and sets Content-Type: application/x-www-form-urlencoded headers
         body: artist,
-      }).then((req) => {     
+      }).then((req) => { 
+          cy.log(req)    
           const splitUrl = req.redirects[0].split('/')
           const ctxArtist = {
             id: splitUrl[splitUrl.length - 1],
@@ -48,7 +55,9 @@ describe('Setup mocked data', () => {
   it('adds shows mock data', () => {
     shows.forEach((show) => {
       const venue = ctxVenues.filter((venue) => venue.name == show.venue_name)
+      expect(venue.length).to.eq(1)
       const artist = ctxArtists.filter((artist) => artist.name == show.artist_name)
+      expect(artist.length).to.eq(1)
       const body = {
           venue_id: venue[0].id,
           artist_id: artist[0].id,
