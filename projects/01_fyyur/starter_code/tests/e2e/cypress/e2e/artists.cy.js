@@ -14,7 +14,7 @@ describe('Artists', () => {
   const upcomingShowsLabel = `${upcomingShowsNum} Upcoming Shows`
   const pastShowsLabel = `${pastShowsNum} Upcoming Shows`
 
-  it.only('should be possible to create an artist entry with minimum data and be redirected to the newly created artist page', () => {
+  it('should be possible to create an artist entry with minimum data and be redirected to the newly created artist page', () => {
     const successAlert = `Artist '${ctxArtist.name}' was successfully listed!`
     
     cy.visit('/')
@@ -59,7 +59,7 @@ describe('Artists', () => {
     cy.get('.items').should('contain.text', ctxArtist.name)
   })
 
-  it.only('should be possible to edit artist', () => {
+  it('should be possible to edit artist', () => {
     const editFormHeading = `Edit artist ${ctxArtist.name}`
     cy.visit(`/artists/${ctxArtist.id}`)
     cy.get('[data-testid="edit-artist-button"]').click()
