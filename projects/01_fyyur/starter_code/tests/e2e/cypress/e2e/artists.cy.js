@@ -80,6 +80,22 @@ describe('Artists', () => {
     checkNotification(successAlert);
     checkArtistFields(ctxArtist, upcomingShowsLabel, pastShowsLabel);
   })
+
+  it('should be possible to delete an artist', () => {
+    const successAlert = `Artist '${ctxArtist.id}' was successfully deleted!`
+    cy.visit(`/artists/${ctxArtist.id}`)
+    cy.get('[data-testid="delete-artist-button"]').click()
+    cy.get('.alert').should('contain.text', successAlert)
+    ctxArtist.id = '';
+    cy.location('pathname').should('eq', '/')
+  })
+  
+  after('delete artist', () => {
+    // Delete the artist after test finished
+    if (ctxArtist.id) {
+      cy.request('POST', `/artists/${ctxArtist.id}/delete`).then((resp) => expect(resp.status).to.eq(200))
+    }
+  })
 })
 
 function checkNotification(successAlert) {

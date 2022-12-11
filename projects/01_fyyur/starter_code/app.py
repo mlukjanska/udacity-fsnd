@@ -334,6 +334,31 @@ def delete_venue(venue_id):
       flash("Venue '" + str(venue_id) + "' was successfully deleted!")
       return redirect(url_for('index'))
 
+# POST because then it is possible to return render home page
+# If keeping DELETE method then AJAX call needs to be done and rendering does not work 
+# the whole idea of AJAX in fact is not to rerender entire page
+@app.route('/artists/<int:artist_id>/delete', methods=['POST'])
+def delete_artist(artist_id):
+  error = False
+  try:
+    artist = Artist.query.get(artist_id) 
+    db.session.delete(artist)
+    db.session.commit()
+  except: 
+    error = True
+    db.session.rollback()
+    print(sys.exc_info())
+  finally:
+    db.session.close()
+    if  error == True:
+      app.logger.debug("Error deleting Artist with id: " + str(artist_id))
+      flash("An error occurred. Artist with id '" + str(artist_id) + "' could not be deleted.")
+      return render_template('errors/500.html')
+    else:    
+      app.logger.debug("Successfully delete Artist with id: " + str(artist_id))
+      flash("Artist '" + str(artist_id) + "' was successfully deleted!")
+      return redirect(url_for('index'))
+
 #  Artists
 #  ----------------------------------------------------------------
 @app.route('/artists')
